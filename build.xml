@@ -1,0 +1,109 @@
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="urlshortener" basedir="." default="build-webapp">
+	<property file="${basedir}/build.properties" />
+
+	<path id="project.lib.path">
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	<path id="test.classpath">
+		<path refid="project.lib.path" />
+		<pathelement location="${build.classes}" />
+		<pathelement location="${test.build.classes}" />
+	</path>
+
+	<target name="init-ivy">
+		<property file="${user.home}/ivy.properties" />
+		<property file="${basedir}/ivy.properties" />
+
+		<path id="ivy.lib.path">
+			<fileset dir="${ivy.install.dir}" includes="*.jar" />
+		</path>
+		<taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path" />
+	</target>
+
+	<target name="resolve" depends="init-ivy">
+		<delete>
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+			</fileset>
+		</delete>
+
+		<ivy:retrieve />
+	</target>
+
+	<target name="compile" depends="clean, resolve">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.classes}" />
+		<javac destdir="${build.classes}" target="${compile.level}" debug="${compile.debug}" deprecation="${compile.deprecation}" optimize="${compile.optimize}" failonerror="true" encoding="${build.encoding}">
+			<src path="${src.java.dir}" />
+			<classpath refid="project.lib.path" />
+		</javac>
+
+		<copy todir="${build.classes}" overwrite="true">
+			<fileset dir="${src.java.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+			<fileset dir="${src.resources.dir}">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="compile-test" depends="compile">
+		<mkdir dir="${test.build.dir}" />
+		<mkdir dir="${test.build.classes}" />
+		<javac destdir="${test.build.classes}" target="${compile.level}" debug="${compile.debug}" deprecation="${compile.deprecation}" optimize="${compile.optimize}" failonerror="true" encoding="${build.encoding}">
+			<src path="${test.java.dir}" />
+			<classpath refid="test.classpath" />
+		</javac>
+	</target>
+
+	<target name="test" depends="compile-test">
+		<junit printsummary="true" showoutput="true">
+			<classpath refid="test.classpath" />
+			<batchtest>
+				<fileset dir="${test.build.classes}" includes="**/*Test.class">
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="build-webapp" depends="compile">
+		<copy todir="${build.web}">
+			<fileset dir="${src.webapp.dir}">
+				<filename name="**/**" />
+			</fileset>
+		</copy>
+
+		<copy todir="${build.web}/WEB-INF/classes">
+			<fileset dir="${build.classes}">
+				<filename name="**/**" />
+				<exclude name="META-INF" />
+				<exclude name="**/*Test.class" />
+			</fileset>
+		</copy>
+		<copy todir="${build.web}/WEB-INF/lib">
+			<fileset dir="${lib.dir}">
+				<filename name="**/*.jar" />
+			</fileset>
+		</copy>
+
+		<manifest file="${build.web}/META-INF/MANIFEST.MF">
+			<attribute name="Built-Version" value="${version}" />
+		</manifest>
+
+		<war needxmlfile="false" destfile="${build.dir}/${dist.name}.zip" manifest="${build.web}/META-INF/MANIFEST.MF">
+			<fileset dir="${build.web}">
+				<exclude name="**/jsp-api*.jar" />
+				<exclude name="**/jstl*.jar" />
+				<exclude name="**/servlet-api*.jar" />
+				<exclude name="**/standard*.jar" />
+			</fileset>
+		</war>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+</project>

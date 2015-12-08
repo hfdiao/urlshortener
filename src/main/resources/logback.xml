@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="300 seconds">
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+        <encoder>
+            <pattern>%d %t %-5level %c{0}.%M:%L -%m%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="github.hfdiao.urlshortener" level="DEBUG" additivity="false">
+        <appender-ref ref="stdout" />
+    </logger>
+    <root level="INFO">
+        <appender-ref ref="stdout" />
+    </root>
+</configuration>

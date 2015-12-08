@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC 
+    "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="github.hfdiao.urlshortener.dao.URLMappingDAO">
+    <cache />
+    <sql id="tableName">urlmapping</sql>
+    <select id="getByShortenedPath" resultType="URLMapping" parameterType="String">
+        select * from
+        <include refid="tableName" />
+        where shortenedPath=#{value};
+    </select>
+    <select id="getByURLHash" resultType="URLMapping" parameterType="long">
+        select * from
+        <include refid="tableName" />
+        where urlHash=#{value};
+    </select>
+    <insert id="add" parameterType="URLMapping" useGeneratedKeys="true"
+        keyProperty="id">
+        insert into
+        <include refid="tableName" />
+        (shortenedPath, reversedURL, urlHash, created)
+        values(#{shortenedPath}, #{reversedURL}, #{urlHash}, #{created});
+    </insert>
+</mapper>

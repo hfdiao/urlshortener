@@ -1,0 +1,15 @@
+*.class
+
+# IDE Settings #
+.settings/
+.project
+.classpath
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Build Directory #
+/build
+/target
