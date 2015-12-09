@@ -3,13 +3,13 @@
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <target>System.out</target>
         <encoder>
-            <pattern>%d %t %-5level %c{0}.%M:%L -%m%n</pattern>
+            <pattern>%d %t %-5level - %m%n</pattern>
         </encoder>
     </appender>
-    <logger name="github.hfdiao.urlshortener" level="DEBUG" additivity="false">
+    <logger name="github.hfdiao.urlshortener" level="INFO" additivity="false">
         <appender-ref ref="stdout" />
     </logger>
-    <root level="INFO">
+    <root level="ERROR">
         <appender-ref ref="stdout" />
     </root>
 </configuration>
