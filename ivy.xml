@@ -23,6 +23,9 @@
             conf="default->default" />
         <dependency org="org.mybatis" name="mybatis" rev="3.3.0"
             conf="default->default" />
+        <dependency org="org.aspectj" name="aspectjweaver" rev="1.8.7"
+            conf="default->default" />
+            
         <dependency org="org.springframework" name="spring-web" rev="4.2.3.RELEASE"
             conf="default->default" />
         <dependency org="org.springframework" name="spring-webmvc" rev="4.2.3.RELEASE"
@@ -38,6 +41,8 @@
         <dependency org="org.springframework" name="spring-tx" rev="4.2.3.RELEASE"
             conf="default->default" />
         <dependency org="org.springframework" name="spring-jdbc" rev="4.2.3.RELEASE"
+            conf="default->default" />
+        <dependency org="org.springframework" name="spring-aop" rev="4.2.3.RELEASE"
             conf="default->default" />
             
         <dependency org="org.springframework" name="spring-test" rev="4.2.3.RELEASE"
