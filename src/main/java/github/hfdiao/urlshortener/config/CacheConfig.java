@@ -17,28 +17,33 @@
  */
 package github.hfdiao.urlshortener.config;
 
-import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.cache.support.SimpleCacheManager;
+import org.springframework.context.annotation.Bean;
 
 /**
  * @author dhf
  *
  */
-public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+@EnableCaching
+public class CacheConfig {
 
-	@Override
-	protected Class<?>[] getRootConfigClasses() {
-		return new Class<?>[] { PropertyPlaceholderConfig.class, DAOConfig.class, CacheConfig.class,
-				ServiceConfig.class };
+	public static final String CACHE_NAME = "default";
+
+	@Bean
+	public CacheManager cacheManager() {
+		ConcurrentMapCache cache = new ConcurrentMapCache(CACHE_NAME);
+		Set<Cache> caches = new HashSet<>();
+		caches.add(cache);
+
+		SimpleCacheManager manager = new SimpleCacheManager();
+		manager.setCaches(caches);
+		return manager;
 	}
-
-	@Override
-	protected Class<?>[] getServletConfigClasses() {
-		return new Class<?>[] { WebMVCConfig.class };
-	}
-
-	@Override
-	protected String[] getServletMappings() {
-		return new String[] { "/" };
-	}
-
 }

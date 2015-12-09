@@ -18,8 +18,10 @@
 package github.hfdiao.urlshortener.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import github.hfdiao.urlshortener.config.CacheConfig;
 import github.hfdiao.urlshortener.dao.URLMappingDAO;
 import github.hfdiao.urlshortener.exception.ResourceNotFoundException;
 import github.hfdiao.urlshortener.exception.URLShortenException;
@@ -91,6 +93,7 @@ public class SimpleURLShortener implements URLShortener {
 	}
 
 	@Override
+	@Cacheable(CacheConfig.CACHE_NAME)
 	public String reinstate(String shortenedPath) throws ResourceNotFoundException {
 		Asserts.check(Strings.isAlphanumerics(shortenedPath), "no a valid shortenedPath: " + shortenedPath);
 
