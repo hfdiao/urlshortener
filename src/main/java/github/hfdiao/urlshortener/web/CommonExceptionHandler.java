@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import github.hfdiao.urlshortener.exception.ResourceNotFoundException;
 import github.hfdiao.urlshortener.util.HTTPRequests;
@@ -37,24 +38,35 @@ import github.hfdiao.urlshortener.util.HTTPRequests;
 public class CommonExceptionHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(CommonExceptionHandler.class);
 
-	@ExceptionHandler(ResourceNotFoundException.class)
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public String resourceNotFound() {
-		return "404";
-	}
+	private static final ModelAndView ERROR_BAD_REQUEST = error(400, "Illegal Argument");
+	private static final ModelAndView ERROR_NOT_FOUND = error(404, "Resource Not Found");
+	private static final ModelAndView ERROR_SERVER_ERROR = error(500, "Server Exception");
 
 	@ExceptionHandler(IllegalArgumentException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public String illegalArgument() {
-		return "400";
+	public ModelAndView illegalArgument() {
+		return ERROR_BAD_REQUEST;
+	}
+
+	@ExceptionHandler(ResourceNotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ModelAndView resourceNotFound() {
+		return ERROR_NOT_FOUND;
 	}
 
 	@ExceptionHandler(Throwable.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public String serverError(HttpServletRequest request, Throwable e) {
+	public ModelAndView serverError(HttpServletRequest request, Throwable e) {
 		LOG.error("request uri: {}, params: {}", request.getRequestURI(),
 				HTTPRequests.toQueryStr(request.getParameterMap()), e);
 
-		return "500";
+		return ERROR_SERVER_ERROR;
+	}
+
+	private static ModelAndView error(int statusCode, String errorMessage) {
+		ModelAndView mav = new ModelAndView("error");
+		mav.addObject("statusCode", statusCode);
+		mav.addObject("errorMessage", errorMessage);
+		return mav;
 	}
 }
