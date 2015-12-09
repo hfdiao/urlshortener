@@ -17,10 +17,6 @@
  */
 package github.hfdiao.urlshortener.web;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,7 +24,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import github.hfdiao.urlshortener.exception.ResourceNotFoundException;
-import github.hfdiao.urlshortener.util.HTTPRequests;
 
 /**
  * @author dhf
@@ -36,8 +31,6 @@ import github.hfdiao.urlshortener.util.HTTPRequests;
  */
 @ControllerAdvice
 public class CommonExceptionHandler {
-	private static final Logger LOG = LoggerFactory.getLogger(CommonExceptionHandler.class);
-
 	private static final ModelAndView ERROR_BAD_REQUEST = error(400, "Illegal Argument");
 	private static final ModelAndView ERROR_NOT_FOUND = error(404, "Resource Not Found");
 	private static final ModelAndView ERROR_SERVER_ERROR = error(500, "Server Exception");
@@ -56,10 +49,7 @@ public class CommonExceptionHandler {
 
 	@ExceptionHandler(Throwable.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public ModelAndView serverError(HttpServletRequest request, Throwable e) {
-		LOG.error("request uri: {}, params: {}", request.getRequestURI(),
-				HTTPRequests.toQueryStr(request.getParameterMap()), e);
-
+	public ModelAndView serverError() {
 		return ERROR_SERVER_ERROR;
 	}
 
