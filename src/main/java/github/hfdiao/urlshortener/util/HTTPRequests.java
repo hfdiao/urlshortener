@@ -15,46 +15,59 @@
 /**
  * 
  */
-package github.hfdiao.urlshortener.web;
+package github.hfdiao.urlshortener.util;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-import github.hfdiao.urlshortener.exception.ResourceNotFoundException;
-import github.hfdiao.urlshortener.util.HTTPRequests;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
+import java.net.URLEncoder;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author dhf
  *
  */
-@ControllerAdvice
-public class CommonExceptionHandler {
-	private static final Logger LOG = LoggerFactory.getLogger(CommonExceptionHandler.class);
+public interface HTTPRequests {
 
-	@ExceptionHandler(ResourceNotFoundException.class)
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	public String resourceNotFound() {
-		return "404";
+	public static String toQueryStr(Map<String, ? extends Object> parameters) {
+		return toQueryStr(parameters, "utf-8");
 	}
 
-	@ExceptionHandler(IllegalArgumentException.class)
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public String illegalArgument() {
-		return "400";
+	public static String toQueryStr(Map<String, ? extends Object> parameters, String encoding) {
+		if (null == parameters || parameters.size() == 0) {
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		for (Entry<String, ? extends Object> entry : parameters.entrySet()) {
+			String key = entry.getKey();
+			Object value = entry.getValue();
+			if (null == key || null == value) {
+				continue;
+			}
+			if (value.getClass().isArray()) {
+				int length = Array.getLength(value);
+				for (int i = 0; i < length; ++i) {
+					sb.append(urlencode(key, encoding)).append("=").append(urlencode(Array.get(value, i), encoding))
+							.append("&");
+				}
+			} else {
+				sb.append(urlencode(key, encoding)).append("=").append(urlencode(value, encoding)).append("&");
+			}
+		}
+		if (sb.length() > 0) {
+			sb.deleteCharAt(sb.length() - 1);
+		}
+		return sb.toString();
 	}
 
-	@ExceptionHandler(Throwable.class)
-	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-	public String serverError(HttpServletRequest request, Throwable e) {
-		LOG.error("request uri: {}, params: {}", request.getRequestURI(),
-				HTTPRequests.toQueryStr(request.getParameterMap()), e);
-
-		return "500";
+	public static String urlencode(Object obj, String encoding) {
+		if (null == obj) {
+			return null;
+		}
+		try {
+			return URLEncoder.encode(obj.toString(), encoding);
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
